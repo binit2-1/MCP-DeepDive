@@ -14,6 +14,7 @@ const server = new McpServer({
 
 const ALLOWED_ROOT = path.join(os.homedir(), "Desktop");
 
+//read directory, files
 server.registerTool(
   "list_dir",
   {
@@ -57,7 +58,7 @@ server.registerTool(
           content: [
             {
               type: "text",
-              text: `ERR: Recieved a fatal error ${error.message} cause ${error.cause}`,
+              text: `${error.message} `,
             },
           ],
         };
@@ -74,32 +75,115 @@ server.registerTool(
   }
 );
 
+//os and system analytics
 server.registerTool(
-    "system_stats",
-    {
-        description: "This tool fetches the current system stats",
-    },
-    async() => {
-        const cpus: os.CpuInfo[] = os.cpus();
-        const totalMem = os.totalmem() / (1024 * 1024 * 1024)
-        const freeMem = os.freemem() / (1024 * 1024 * 1024)
+  "system_stats",
+  {
+    description: "This tool fetches the current system stats",
+  },
+  async () => {
+    try {
+      const cpus: os.CpuInfo[] = os.cpus();
+      const totalMem = os.totalmem() / (1024 * 1024 * 1024);
+      const freeMem = os.freemem() / (1024 * 1024 * 1024);
 
-        const stats: string = `
-        SYSTEM STATS:
-        -OS: ${os.type()} ${os.release()}
-        -CPU: ${cpus[0]?.model} (${cpus.length} cores)
-        -MEMORY: ${freeMem.toFixed(2)} GB free / ${totalMem.toFixed(2)} GB total `
+      const stats: string = `
+            SYSTEM STATS:
+            -OS: ${os.type()} ${os.release()}
+            -CPU: ${cpus[0]?.model} (${cpus.length} cores)
+            -MEMORY: ${freeMem.toFixed(2)} GB free / ${totalMem.toFixed(
+        2
+      )} GB total `;
 
-        return{
-            content:[
-                {
-                    type: 'text',
-                    text: stats
-                }
-            ]
-        }
+      return {
+        content: [
+          {
+            type: "text",
+            text: stats,
+          },
+        ],
+      };
+    } catch (error) {
+      if (error instanceof Error) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: `${error.message}`,
+            },
+          ],
+        };
+      }
+      return {
+        content: [
+          {
+            type: "text",
+            text: `ERR: ${error}`,
+          },
+        ],
+      };
     }
-)
+  }
+);
 
-const transport = new StdioServerTransport()
-server.connect(transport)
+server.registerTool(
+  "read_file",
+  {
+    description: `Reads the last 10 lines of a file within the ${ALLOWED_ROOT}`,
+    inputSchema: z.object({
+      path: z
+        .string()
+        .describe(
+          `The path to the list to list files from. Must be within ${ALLOWED_ROOT}`
+        ),
+    }),
+  },
+  async ({ path }) => {
+    if (!path.startsWith(ALLOWED_ROOT)) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: `ERR: Access Denied, path should be within ${ALLOWED_ROOT}`,
+          },
+        ],
+      };
+    }
+    try {
+      const content = await fs.readFile(path, "utf8");
+      const lines = content.split("\n");
+      const lastTen = lines.slice(-10).join("\n");
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: `last 10 lines of ${path}: \n ${lastTen}`,
+          },
+        ],
+      };
+    } catch (error) {
+      if (error instanceof Error) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: `${error.message}`,
+            },
+          ],
+        };
+      }
+      return {
+        content: [
+          {
+            type: "text",
+            text: `ERR: ${error}`,
+          },
+        ],
+      };
+    }
+  }
+);
+
+const transport = new StdioServerTransport();
+server.connect(transport);
