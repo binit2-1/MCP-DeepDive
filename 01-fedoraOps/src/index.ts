@@ -1,9 +1,9 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
-import fs from "fs/promises";
-import os from "os";
-import path from "path";
+import * as fs from "fs/promises";
+import * as os from "os";
+import * as path from "path";
 
 const server = new McpServer({
   name: "FedoraOps",
@@ -126,6 +126,7 @@ server.registerTool(
   }
 );
 
+//read last 10 lines of a file
 server.registerTool(
   "read_file",
   {

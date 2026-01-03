@@ -6,7 +6,9 @@
   "type":"module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "server:inspect": "npx @modelcontextprotocol/inspector npx tsx src/index.ts"
+    "server:dev": "npx tsc dist/index.js",
+    "server:build:watch":"tsc --watch",
+    "server:inspect": "npx @modelcontextprotocol/inspector npm run server:dev"
   },
   "keywords": [],
   "author": "",
