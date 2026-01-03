@@ -27,8 +27,8 @@ server.registerTool(
         ),
     }),
   },
-  async ({ path: dirPath }) => {
-    if (!dirPath.startsWith(ALLOWED_ROOT)) {
+  async ({ path }) => {
+    if (!path.startsWith(ALLOWED_ROOT)) {
       return {
         content: [
           {
@@ -39,7 +39,7 @@ server.registerTool(
       };
     }
     try {
-      const files = await fs.readdir(dirPath, { withFileTypes: true });
+      const files = await fs.readdir(path, { withFileTypes: true });
       const formatted = files
         .map((f) => (f.isDirectory() ? `[DIR] ${f.name}` : f.name))
         .join("\n");
@@ -47,7 +47,7 @@ server.registerTool(
         content: [
           {
             type: "text",
-            text: `Files in ${dirPath}:\n${formatted}`,
+            text: `Files in ${path}:\n${formatted}`,
           },
         ],
       };
@@ -74,6 +74,32 @@ server.registerTool(
   }
 );
 
+server.registerTool(
+    "system_stats",
+    {
+        description: "This tool fetches the current system stats",
+    },
+    async() => {
+        const cpus: os.CpuInfo[] = os.cpus();
+        const totalMem = os.totalmem() / (1024 * 1024 * 1024)
+        const freeMem = os.freemem() / (1024 * 1024 * 1024)
+
+        const stats: string = `
+        SYSTEM STATS:
+        -OS: ${os.type()} ${os.release()}
+        -CPU: ${cpus[0]?.model} (${cpus.length} cores)
+        -MEMORY: ${freeMem.toFixed(2)} GB free / ${totalMem.toFixed(2)} GB total `
+
+        return{
+            content:[
+                {
+                    type: 'text',
+                    text: stats
+                }
+            ]
+        }
+    }
+)
 
 const transport = new StdioServerTransport()
 server.connect(transport)
