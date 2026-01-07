@@ -1,7 +1,7 @@
 import * as fs from "fs/promises";
 import * as path from "path";
 import * as os from "os";
-import { LOG_DIR } from "../config";
+import { LOG_DIR } from "../config.js";
 
 export async function ensureDir() {
     await fs.mkdir(LOG_DIR, {recursive:true});
