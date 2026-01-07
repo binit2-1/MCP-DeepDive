@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
-    "server:dev": "npx tsx dist/index.js",
+    "server:dev": "npx tsx ./index.js",
     "server:build:watch":"tsc --watch",
     "server:inspect": "npx @modelcontextprotocol/inspector npm run server:dev"
   },
