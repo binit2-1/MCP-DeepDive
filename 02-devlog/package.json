@@ -5,9 +5,9 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/index.js",
-    "dev": "npx tsx src/index.ts",
-    "inspector": "npx @modelcontextprotocol/inspector npx tsx src/index.ts"
+    "server:dev": "npx tsx dist/index.js",
+    "server:build:watch":"tsc --watch",
+    "server:inspect": "npx @modelcontextprotocol/inspector npm run server:dev"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.1",
