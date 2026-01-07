@@ -3,6 +3,7 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { SERVER_CONFIG } from "./config.js";
 import { registerResources } from "./resources/index.js";
 import { registerPromptResources } from "./prompts/index.js";
+import { registerTool } from "./tools/index.js";
 
 async function main(){
   const server = new McpServer({
@@ -13,6 +14,7 @@ async function main(){
 
   registerResources(server)
   registerPromptResources(server)
+  registerTool(server)
 
   const transport = new StdioServerTransport
   await server.connect(transport)
